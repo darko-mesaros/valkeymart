@@ -3,6 +3,12 @@ An example of using Valkey on MemoryDB with a Flask Python application
 
 ![valkeymart screenshot](/img/valkeymart.png)
 
+## Valkey client instance
+
+This stack includes an EC2 instance that serves as a valkey client. It has `valkey-cli` installed locally and is created in the same VPC as the Valkey cluster.
+
+To connect to this instance, please use *AWS SSM Session Manager*, either via the AWS Console, or using the CLI. You will need the [Session Manager Plugin](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html) for this to work using the AWS CLI.
+
 ## Application
 
 ValkeyMart is just a *very* simple application that simulates a shopping cart for a random user. And it stores all of the items in the shopping cart to an in-memory database, using Valkey for AWS MemoryDB.
@@ -77,3 +83,8 @@ To remove any container images just run:
 ```
 make clean
 ```
+
+If any of these fail **make sure you have the following packages installed**:
+- GNU Make
+- docker compose
+- docker buildx

@@ -5,15 +5,66 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ValkeyMart Shopping Cart 🛒</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
 </head>
 <body class="bg-gray-100 min-h-screen">
     <div class="container mx-auto px-4 py-8">
         <h1 class="text-3xl font-bold mb-8 text-center text-gray-800">ValkeyMart Shopping Cart 🛒</h1>
-        
+        <!-- Welcome user banner -->
+        <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 rounded-lg shadow-md mb-8">
+          <div class="flex items-center space-x-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              <div>
+                  <p class="text-sm font-medium">Welcome User:</p>
+                  <p class="text-lg font-bold">{{user}}</p>
+              </div>
+          </div>
+      </div>
+      <!-- Featured Products Section -->
+      <div class="mb-8">
+          <div class="flex items-center justify-between mb-4 bg-slate-200 rounded-lg p-3">
+              <h2 class="text-xl font-semibold text-gray-700">Featured Products</h2>
+              <p class="text-sm text-gray-500 italic">⚡ retrieved from an in-memory database</p>
+          </div>
+          <div class="flex space-x-4">
+              {% for product in featured_products %}
+              <form action="{{ url_for('add_to_cart') }}" method="post">
+                  <input type="hidden" name="item_id" value="{{ product }}">
+                  <input type="hidden" name="quantity" value="1">
+                  <button type="submit"
+                          class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                      {{ product }}
+                  </button>
+              </form>
+              {% endfor %}
+          </div>
+      </div>
+
+      <!-- Other Products Section -->
+      <div class="mb-8">
+          <div class="flex items-center justify-between mb-4 bg-slate-200 rounded-lg p-3">
+              <h2 class="text-xl font-semibold text-gray-700">Other Products</h2>
+              <p class="text-sm text-gray-500 italic">💾 retrieved from some other - slower - database</p>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {% for product in other_products %}
+              <form action="{{ url_for('add_to_cart') }}" method="post">
+                  <input type="hidden" name="item_id" value="{{ product }}">
+                  <input type="hidden" name="quantity" value="1">
+                  <button type="submit"
+                          class="w-full px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                      {{ product }}
+                  </button>
+              </form>
+              {% endfor %}
+          </div>
+      </div>
         <div class="bg-white shadow-md rounded-lg p-6 mb-8">
             <h2 class="text-xl font-semibold mb-4 text-gray-700">Add Item to Cart (any name is fine)</h2>
             <form action="{{ url_for('add_to_cart') }}" method="post" class="flex flex-col sm:flex-row gap-4">
-                <input type="text" name="item_id" placeholder="Item ID" required
+                <input type="text" name="item_id" placeholder="Item name" required
                        class="flex-grow px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <input type="number" name="quantity" value="1" min="1" required
                        class="w-24 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">

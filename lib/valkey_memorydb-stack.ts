@@ -4,7 +4,10 @@ import * as memorydb from 'aws-cdk-lib/aws-memorydb';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as assets from 'aws-cdk-lib/aws-ecr-assets';
 import * as apprunner from '@aws-cdk/aws-apprunner-alpha';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import path = require('path');
+import {readFileSync} from 'fs';
+
 
 export class ValkeyMemorydbStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -35,6 +38,29 @@ export class ValkeyMemorydbStack extends cdk.Stack {
       ec2.Port.tcp(6379)
     );
 
+    // Valkey-CLI host
+    // SSM Role
+    const ssmRole = new iam.Role(this, "SSMRole",{
+      assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com')
+    });
+    ssmRole.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMManagedInstanceCore'));
+
+    // EC2 Instance
+    const valkeyClientHost = new ec2.Instance(this, 'valkeyClientHost',{
+      vpc,
+      role: ssmRole,
+      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T4G, ec2.InstanceSize.MICRO),
+      machineImage: ec2.MachineImage.latestAmazonLinux2023({
+        cpuType: ec2.AmazonLinuxCpuType.ARM_64
+      })
+    });
+    const userDataScript = readFileSync('./assets/user-data.sh', 'utf8');
+    valkeyClientHost.addUserData(userDataScript);
+    // SSM session manager command
+    new cdk.CfnOutput(this, 'ssmSessionManagerCommand',{
+      description: "Session Manager Command",
+      value: 'aws ssm start-session --target '+valkeyClientHost.instanceId
+    });
 
     // MemoryDB
     // SubnetGroup
@@ -94,10 +120,31 @@ export class ValkeyMemorydbStack extends cdk.Stack {
             //
             //REDIS_PORT: cdk.Token.asString(valkeyCluster.attrClusterEndpointPort),
             SSL: 'True',
+            LOCAL: 'False',
           }
         }
       })
 
+    });
+
+    // Outputs
+    // App Runner Endpint URL
+    new cdk.CfnOutput(this, 'apprunnerEndpoint',{
+      description: "App Runner Endpoint URL",
+      value: 'https://'+valkeyMart.serviceUrl
+    });
+
+    // Valkey DB endpoint
+    new cdk.CfnOutput(this, 'memoryDBEndpoint',{
+      description: "MemoryDB Endpoint URL",
+      value: valkeyCluster.attrClusterEndpointAddress
+    });
+
+    // Valkey CLI connect command:
+    // NOTE: This has the port as hardcoded
+    new cdk.CfnOutput(this, 'valkeyCLIConnect',{
+      description: "Valkey CLI Connection command",
+      value: 'valkey-cli -h '+valkeyCluster.attrClusterEndpointAddress+' -p 6379 -c --tls'
     });
 
 

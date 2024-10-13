@@ -7,9 +7,11 @@ HOST_IP := $(shell ip -4 addr show docker0 | grep -Po 'inet \K[\d.]+')
 # Sets ssl to false for local connections
 REDIS_PORT = '6379'
 SSL=False
+LOCAL=True
 
 build:
-	docker build -t $(IMAGE_NAME):$(IMAGE_TAG) .
+	#docker build -t $(IMAGE_NAME):$(IMAGE_TAG) .
+	docker buildx build --platform linux/amd64 -t $(IMAGE_NAME):$(IMAGE_TAG) .
 
 # Checks if a local instance of redis/valkey is running
 check-local:
@@ -25,6 +27,7 @@ run: check-local
 		-p 5000:5000 \
 		-e REDIS_URL=$(HOST_IP) \
 		-e SSL=$(SSL) \
+		-e LOCAL=$(LOCAL) \
 		$(IMAGE_NAME):$(IMAGE_TAG)
 
 all: build run
