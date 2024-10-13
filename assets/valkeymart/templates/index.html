@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ValkeyMart Shopping Cart 🛒</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-8 text-center text-gray-800">ValkeyMart Shopping Cart 🛒</h1>
+        
+        <div class="bg-white shadow-md rounded-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Add Item to Cart (any name is fine)</h2>
+            <form action="{{ url_for('add_to_cart') }}" method="post" class="flex flex-col sm:flex-row gap-4">
+                <input type="text" name="item_id" placeholder="Item ID" required
+                       class="flex-grow px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <input type="number" name="quantity" value="1" min="1" required
+                       class="w-24 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button type="submit" 
+                        class="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    Add to Cart
+                </button>
+            </form>
+        </div>
+
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Cart Contents</h2>
+            {% if cart %}
+                <ul class="divide-y divide-gray-200">
+                {% for item_id, quantity in cart.items() %}
+                    <li class="py-4 flex justify-between items-center">
+                        <span class="text-gray-800">{{ item_id }}: {{ quantity }}</span>
+                        <form action="{{ url_for('remove_from_cart') }}" method="post" class="inline">
+                            <input type="hidden" name="item_id" value="{{ item_id }}">
+                            <button type="submit" 
+                                    class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                                Remove One
+                            </button>
+                        </form>
+                    </li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-gray-600">Your cart is empty</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
