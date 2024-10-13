@@ -86,5 +86,6 @@ make clean
 
 If any of these fail **make sure you have the following packages installed**:
 - GNU Make
+- GNU netcat (needed for one of the `Makefile` checks)
 - docker compose
 - docker buildx
