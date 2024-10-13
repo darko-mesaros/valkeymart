@@ -77,7 +77,11 @@
         </div>
 
         <div class="bg-white shadow-md rounded-lg p-6">
-            <h2 class="text-xl font-semibold mb-4 text-gray-700">Cart Contents</h2>
+          <div class="flex items-center justify-between rounded-lg mb-4">
+              <h2 class="text-xl font-semibold text-gray-700">Cart Contents</h2>
+              <p class="text-sm text-gray-500 italic">⚡ this is also stored in MemoryDB</p>
+          </div>
+            <!-- <h2 class="text-xl font-semibold mb-4 text-gray-700">Cart Contents</h2> -->
             {% if cart %}
                 <ul class="divide-y divide-gray-200">
                 {% for item_id, quantity in cart.items() %}
